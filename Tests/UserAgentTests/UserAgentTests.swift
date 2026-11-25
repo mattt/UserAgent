@@ -1,3 +1,5 @@
+import struct Foundation.Data
+import class Foundation.JSONDecoder
 import Testing
 
 @testable import UserAgent
@@ -248,6 +250,27 @@ struct PredicateTests {
 
 @Suite("Entry Field Tests")
 struct EntryFieldTests {
+
+    @Test(
+        "Safari browser labels preserve the device category",
+        arguments: [
+            ("Mobile Safari", Device.Category.mobile),
+            ("Mobile Safari", .tablet),
+            ("Safari", .desktop),
+        ]
+    )
+    func safariBrowserLabels(label: String, category: Device.Category) throws {
+        let json = """
+            {
+                "user_agent": "fixture", "percent": 1, "type": "\(category.rawValue)", "platform": "test",
+                "browser": "\(label)", "browser_version": "17.2", "browser_version_major_minor": 17.2
+            }
+            """
+        let entry = try JSONDecoder().decode(Entry.self, from: Data(json.utf8))
+
+        #expect(entry.browser.kind == .safari)
+        #expect(entry.device.category == category)
+    }
 
     @Test("Entry contains all required fields")
     func entryRequiredFields() async throws {
