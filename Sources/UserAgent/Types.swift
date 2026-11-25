@@ -274,7 +274,13 @@ extension Entry: Decodable {
             of: " ",
             with: "_"
         )
-        guard let browserKind = Browser.Kind(rawValue: normalizedBrowserName) else {
+        let browserKind: Browser.Kind?
+        if normalizedBrowserName == "mobile_safari" {
+            browserKind = .safari
+        } else {
+            browserKind = Browser.Kind(rawValue: normalizedBrowserName)
+        }
+        guard let browserKind else {
             throw DecodingError.dataCorruptedError(
                 forKey: .browser,
                 in: container,
